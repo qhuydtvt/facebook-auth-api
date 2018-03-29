@@ -11,7 +11,7 @@ var session = require('express-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var user = require('./models/user');
+var User = require('./models/user');
 
 var fbLoginConfig = require('./login/fb');
 
