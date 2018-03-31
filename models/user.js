@@ -25,7 +25,7 @@ UserModel.upsert = (accessToken, refreshToken, profile, cb) => {
     },
     (err, user) => {
        if (!user) {
-            var newUser = new userModel({
+            var newUser = new UserModel({
                fullName: profile.displayName,
                facebookProvider: {
                    id: profile.id,
