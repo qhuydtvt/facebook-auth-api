@@ -1,4 +1,3 @@
-
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -8,9 +7,18 @@ var UserSchema = new Schema({
     facebookProvider: {
       type: {
         id: String,
-        token: String
+        token: String,
+        fullName: String
       },
       select: false
+    },
+    googleProvider: {
+        type: {
+            id: String,
+            token: String,
+            fullName: String
+        },
+        select: false
     }
   });
 
@@ -18,8 +26,33 @@ UserSchema.set('toJSON', {getters: true, virtuals: true});
 
 var UserModel = mongoose.model("user", UserSchema);
 
-UserModel.upsert = (accessToken, refreshToken, profile, cb) => {
-    var userModel = this;
+UserModel.ggUpsert = (accessToken, refreshToken, profile, cb) => {
+    return UserModel.findOne({
+        'googleProvider.id': profile.id
+    },
+    (err, user) => {
+        if (!user) {
+            var newUser = UserModel({
+                googleProvider: {
+                    id: profile.id,
+                    token: accessToken,
+                    fullName: profile.fullName
+                }
+            });
+
+            newUser.save((err, savedUser) => {
+                if (err) {
+                    console.log(err);
+                }
+                cb(err, savedUser); 
+            });
+        } else {
+            return cb(err, user);
+        }
+    });
+};
+
+UserModel.fbUpsert = (accessToken, refreshToken, profile, cb) => {
     return UserModel.findOne({
         'facebookProvider.id': profile.id
     },

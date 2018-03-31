@@ -12,6 +12,7 @@ var passport = require('passport');
 var User = require('./models/user');
 
 var fbLoginConfig = require('./login/fb');
+var ggLoginConfig = require('./login/gg');
 
 // Load config
 var config = require('./config');
@@ -23,6 +24,7 @@ mongoose.connect(config.database);
 
 // Config facebook login
 fbLoginConfig();
+ggLoginConfig();
 
 var app = express();
 app.set('port', process.env.PORT || 7777);
@@ -71,6 +73,32 @@ var sendToken = (req, res) => {
   });
 };
 
+router.post(
+  "/auth/google",
+  (req, res, next) => {
+    passport.authenticate('google-plus-token', (err, user) => {
+      if (err) {
+        res.json({
+          success: 0,
+          message: "Authentication problem",
+          error: err
+        });
+      } else if(!user) {
+        res.json({
+          success: 0,
+          message: "No such user, make sure you include access_token in your request's body"
+        });
+      } else {
+        req.auth = {
+          id: user._id
+        };
+        next();
+      }
+    })(req, res, next);
+  },
+  generateToken, sendToken
+);
+
 
 router.post(
     "/auth/facebook",
@@ -86,7 +114,7 @@ router.post(
           else if(!user) {
             res.json({
               success: 0,
-              message: "No such user"
+              message: "No such user, make sure you include access_token in your request's body"
             });
           }
           else {

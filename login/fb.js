@@ -10,7 +10,7 @@ module.exports = () => {
         clientSecret: "dbf29d470e750d5131ec6169ece05924"
     },
     (accessToken, refreshToken, profile, done) => {
-        User.upsert(accessToken, refreshToken, profile, (err, user) => {
+        User.fbUpsert(accessToken, refreshToken, profile, (err, user) => {
             return done(err, user);
         });
     }));
